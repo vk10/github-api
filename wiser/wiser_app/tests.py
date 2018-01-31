@@ -31,3 +31,6 @@ from django.test import TestCase
 
 #default case top =3 cp = 3
 # http://127.0.0.1:8000/wiser/GetTopContributors/
+
+#Added error handling on Pagination when max_page does not exist
+
