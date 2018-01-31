@@ -147,12 +147,12 @@ class GetTopContributors(APIView):
     print('Starting...')
     # current_page = 3
     top = self.request.query_params.get('top', 3)
-    print ('top', top)
+    # print ('top', top)
     if int(top) <= 0:
       return Response('Top cannot be zero or negative',
                       status=status.HTTP_406_NOT_ACCEPTABLE)
     current_page = int(self.request.query_params.get('curr_page', 3))
-    print ('cp', current_page)
+    # print ('cp', current_page)
     github_name_contrib = dict()
     page_array = getPageLimit(base_uri)
     page_array_len = len(page_array)
