@@ -7,7 +7,7 @@ from django.test import TestCase
 #http://127.0.0.1:8000/docs/
 
 # Create your tests here.
-#case1:
+
 #url to run top 4 for all pages
 #http://127.0.0.1:8000/wiser/GetTopContributors/?top=4
 #Return status = 200
@@ -34,3 +34,8 @@ from django.test import TestCase
 
 #Added error handling on Pagination when max_page does not exist
 
+#In wiser_app/views.py, toggle between incorrect and correct "Access" and then run http://127.0.0.1:8000/wiser/GetTopContributors/
+#Handled the case for incorrect login or ratelimit exceeding
+
+#In wiser_app/views.py, toggle between incorrect and correct "org" and then run http://127.0.0.1:8000/wiser/GetTopContributors/
+#Handled the case to handle bad org request

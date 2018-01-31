@@ -18,10 +18,16 @@ import time
 
 # Create your views here.
 #Constant Values
-Access = 'a4261ce71d7a6a4cfaec782618ecf11e46948d28'
-org = 'github'
+
+Access = 'a4261ce71d7a6a4cfaec782618ecf11e46948d28'#correct
+# Access = 'a4261ce71d7a6a4cfaec782618ecf11e46948d2'#incorrect
+
+org = 'github'#correct
+# org = 'githb'#incorrect
+
 head = {'Authorization': 'token {}'.format(Access)}
 curr_page = 1
+
 #GitHubAPI's per_page max
 per_page = 100
 base_uri = 'https://api.github.com/orgs/' + str(org) + '/repos?&page=1&per_page=' + str(per_page)
@@ -78,7 +84,7 @@ def jsonReader(uri):
     data = r.json()
   elif (r.status_code is status.HTTP_403_FORBIDDEN):
     data = None
-    return Response("Wrong Access Token or requests > APILimit(5k)", status=status.HTTP_403_FORBIDDEN)
+    # return Response("Wrong Access Token or requests > APILimit(5k)", status=status.HTTP_403_FORBIDDEN)
   else:
     data = None
   return data
@@ -117,7 +123,7 @@ class GetRepoList(APIView):
     if (page_array_len != 0):
       last_page = page_array[1]
     else:
-      return Response("Error!", status=status.HTTP_400_BAD_REQUEST)
+      return Response("Wrong Access Token/requests > APILimit(5k)/org not present", status=status.HTTP_401_UNAUTHORIZED)
     while int(current_page) <= int(last_page):
       print(current_page)
       uri_org_repo = 'https://api.github.com/orgs/' + str(org) + '/repos?&page=' + \
@@ -134,7 +140,7 @@ class GetRepoList(APIView):
 class GetTopContributors(APIView):
   '''
   	**API that retrieves the list of Top Contributors for all repo committed to a particular organization**
-  	Request Parameters: (1)Top(default = 3) (2)CurrentPage (default = 3)
+  	Request Parameters: (1)top(default = 3) (2)curr_page (default = 3)
   	'''
   def get(self, request):
     start_time = time.time()
@@ -153,7 +159,7 @@ class GetTopContributors(APIView):
     if (page_array_len != 0):
       last_page = page_array[1]
     else:
-      return Response("Error!", status=status.HTTP_400_BAD_REQUEST)
+      return Response("Wrong Access Token/requests > APILimit(5k)/org not present", status=status.HTTP_400_BAD_REQUEST)
     if int(current_page) > int(last_page):
       return Response('CurrentPage specified is more than LastPage. LastPage = '+str(last_page),status = status.HTTP_406_NOT_ACCEPTABLE)
     while int(current_page) <= int(last_page):
