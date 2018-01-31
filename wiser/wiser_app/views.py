@@ -17,16 +17,21 @@ import re
 import time
 
 # Create your views here.
+#Constant Values
 Access = 'a4261ce71d7a6a4cfaec782618ecf11e46948d28'
 org = 'github'
 head = {'Authorization': 'token {}'.format(Access)}
-curr_page = 3
+curr_page = 1
+#GitHubAPI's per_page max
 per_page = 100
 base_uri = 'https://api.github.com/orgs/' + str(org) + '/repos?&page=1&per_page=' + str(per_page)
 uri = 'https://api.github.com/orgs/' + str(org) + '/repos?&page=' + str(curr_page) + '&per_page=' + str(per_page)
 
 
 def getPageNumber(link, index):
+  '''
+  	**Function to search and parse for page numbers in the link header
+  	'''
   temp = 0
   # Relying on GitHub's header format
   while link != '\n' and link[int(index) + int(temp)] != '&':
@@ -36,6 +41,13 @@ def getPageNumber(link, index):
 
 
 def getPageLimit(base_uri):
+  '''
+  	**Function to Page information to handle pagination
+  	Input :base uri
+  	Output:Array which contains the first page and last page
+  	Assumptions: GithubAPI follows proper header format. GitHubAPI limits calls to 300 users.per_page=100(max)
+  	No error checking done on GitHubAPI's header.
+  	'''
   page_limit = []
   req = requests.get(base_uri, headers=head)
   if (req.status_code == status.HTTP_200_OK):
@@ -56,6 +68,11 @@ def getPageLimit(base_uri):
 
 
 def jsonReader(uri):
+  '''
+  	**Function to instantiate the GitHub with AccessToken
+  	Input : uri
+  	Output : json object
+  	'''
   r = requests.get(uri, headers=head)
   if (r.status_code is status.HTTP_200_OK):
     data = r.json()
@@ -68,6 +85,11 @@ def jsonReader(uri):
 
 
 def repoFromOrg(uri):
+  '''
+  	**Function that queries all the repo from the Org
+  	Input : uri
+  	Output: Set with the 'name' field
+  	'''
   name_list = Set()
   getPageLimit(uri)
   data = jsonReader(uri)
@@ -82,6 +104,11 @@ def repoFromOrg(uri):
 
 
 class GetRepoList(APIView):
+  '''
+  	**API that retrieves the list of all Repo for a particular org**
+  	Request Parameters: None
+
+  	'''
   def get(self, request):
     orgrepolist = Set()
     current_page = 1
@@ -105,11 +132,21 @@ class GetRepoList(APIView):
 
 
 class GetTopContributors(APIView):
+  '''
+  	**API that retrieves the list of Top Contributors for all repo committed to a particular organization**
+  	Request Parameters: (1)Top(default = 3) (2)CurrentPage (default = 3)
+  	'''
   def get(self, request):
     start_time = time.time()
     print('Starting...')
-    current_page = 3
-    top = self.request.query_params.get('top')
+    # current_page = 3
+    top = self.request.query_params.get('top', 3)
+    print ('top', top)
+    if int(top) <= 0:
+      return Response('Top cannot be zero or negative',
+                      status=status.HTTP_406_NOT_ACCEPTABLE)
+    current_page = int(self.request.query_params.get('curr_page', 3))
+    print ('cp', current_page)
     github_name_contrib = dict()
     page_array = getPageLimit(base_uri)
     page_array_len = len(page_array)
@@ -117,6 +154,8 @@ class GetTopContributors(APIView):
       last_page = page_array[1]
     else:
       return Response("Error!", status=status.HTTP_400_BAD_REQUEST)
+    if int(current_page) > int(last_page):
+      return Response('CurrentPage specified is more than LastPage. LastPage = '+str(last_page),status = status.HTTP_406_NOT_ACCEPTABLE)
     while int(current_page) <= int(last_page):
       contrib_uri = 'https://api.github.com/orgs/' + str(org) + '/repos?&page=' + str(
         current_page) + '&per_page=' + str(per_page)
@@ -145,8 +184,8 @@ class GetTopContributors(APIView):
     else:
       print('Successful Completion')
       print("--- %s seconds ---" % (time.time() - start_time))
+      # return Response(str(sorted_contributors[:int(top)]) + " Time(in secs) = " + str(time.time() - start_time), status=status.HTTP_200_OK)
       return Response(sorted_contributors[:int(top)], status=status.HTTP_200_OK)
-    # return Response(last_page, status = status.HTTP_200_OK)
 
 
 
