@@ -45,7 +45,7 @@ psycopg2==2.7.3.2
 ptyprocess==0.5.2
 pyasn1==0.4.2
 pycparser==2.18
-Pygments==2.2.0
+Pygments==2.7.4
 python-dateutil==2.6.1
 python-openid==2.2.5
 pytz==2017.3
