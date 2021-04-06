@@ -17,7 +17,7 @@ cryptography==2.1.4
 decorator==4.1.2
 Django==1.11.7
 django-filter==1.1.0
-django-registration==2.3
+django-registration==3.1.2
 django-rest-swagger==2.1.2
 django-transfer==0.4
 djangorestframework==3.7.3
